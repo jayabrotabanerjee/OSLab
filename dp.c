@@ -16,16 +16,16 @@ void *philosopher(void *num) {
         sleep(rand() % 3);  // Thinking time
 
         // Pick up forks
-        pthread_mutex_lock(&forks[id]);
-        pthread_mutex_lock(&forks[(id + 1) % num_philosophers]);
+        pthread_mutex_lock(&forks[id - 1]);  // Adjusted for 1-based index
+        pthread_mutex_lock(&forks[id % num_philosophers]);  // Right fork based on modulo
         
         // Eating
         printf("Philosopher %d is eating.\n", id);
         sleep(rand() % 3);  // Eating time
         
         // Put down forks
-        pthread_mutex_unlock(&forks[id]);
-        pthread_mutex_unlock(&forks[(id + 1) % num_philosophers]);
+        pthread_mutex_unlock(&forks[id - 1]);  // Left fork
+        pthread_mutex_unlock(&forks[id % num_philosophers]);  // Right fork
     }
 
     return NULL;
@@ -50,7 +50,7 @@ int main() {
 
     // Create philosopher threads
     for (int i = 0; i < num_philosophers; i++) {
-        ids[i] = i;
+        ids[i] = i + 1;  // Philosopher IDs start from 1
         pthread_create(&philosophers[i], NULL, philosopher, &ids[i]);
     }
 
